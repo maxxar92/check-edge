@@ -22,7 +22,7 @@ sudo apt update
 sudo apt install curl
 ```
 
-The check procedure itself (edge-cli check) needs to run as **root** there it's necessary for check-edge too.
+The check procedure itself (edge-cli check) needs to run as **root** therefore it's necessary for check-edge too.
 
 ### Installation
 Start the installation with this one-line command:
@@ -50,7 +50,7 @@ nano /root/scripts/check-edge.cfg
 ```
 
 Change **SERVERURL** to the URL you got from the Edge community.
-Copy your **DEVICEID**, you will need it to register your node on the Telegram Bot.
+Copy your **DEVICE-ID**, you will need it to register your node on the Telegram Bot.
 Save the file by `CTRL-X Y <Enter>`.
 
 ### Register your Node on the Telegram Bot
@@ -74,10 +74,10 @@ With the following command you create a Crontab entry which will start the scrip
 check-edge setcron
 ```
 
-Changes to this default settings can made by `crontab -e` but please be cautious to use the right syntax.
+Changes to this default settings can be made by `crontab -e` but please be cautious to use the right syntax.
 
 ### Other Commands
-Further commands which are shown by `check-edge help`.
+Further commands are shown by `check-edge help`.
 
 ## Contact
 Error reports and suggestions please via Github/Issues or PM on Telegram (@befranz)
