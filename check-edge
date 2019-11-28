@@ -121,7 +121,7 @@ case "${1,,}" in
   # Help
   "help")
     echo
-    echo "check-edge: Runs edge-cli check and posts changes to Telegram Bot."
+    echo "check-edge: Runs 'edge-cli check' and posts changes to Telegram Bot."
     echo
     echo "Usage:"
     echo "  check-edge [command]"
