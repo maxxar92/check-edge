@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.54"
+CEVERSION="0.55"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -40,7 +40,7 @@ else
    # Create Config File
    EDGECLI="$(command -v edge-cli)"
    echo '# URL to the server which runs the Telegram bot' >"$USRCFG"
-   echo 'SERVERURL="http://edge-analytics.org/api/update/"' >>"$USRCFG"
+   echo 'SERVERURL="http://edge-analytics.org/api/update"' >>"$USRCFG"
    echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
    echo "# by entering this text: /register $DEVID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
@@ -54,9 +54,6 @@ else
    exit 1
 fi
 
-if [ "${SERVERURL:-1}" != "/" ]; then
-  SERVERURL="${SERVERURL}/"
-fi
 URL="${SERVERURL}${DEVICEID}"
 
 # Running via Cron?
