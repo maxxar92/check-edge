@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.52"
+CEVERSION="0.53"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -42,7 +42,7 @@ else
    echo '# Set the URL to the server which runs the Telegram bot' >"$USRCFG"
    echo 'SERVERURL="http://server.domain.org/api/update"' >>"$USRCFG"
    echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
-   echo "# by entering this text: /register $DEVICEID" >>"$USRCFG"
+   echo "# by entering this text: /register $DEVID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
    echo "EDGECLI=\"$EDGECLI\"" >>"$USRCFG"
    echo
@@ -132,10 +132,20 @@ case "${1,,}" in
     echo "  setcron    Create a Crontab entry for scheduled execution (default every 30 min.)"
     echo "             Use crontab -e to change this setting"
     echo "  update     Download the latest version from https://github.com/befranz/check-edge"
+    echo "  version    Show version of the script"
     echo "  help       This output"
     echo
     exit 0
     ;;
+
+  # Show Version
+  "version")
+    echo
+    echo "check-edge v.${CEVERSION}"
+    echo
+    exit 0
+    ;;
+
 esac
 
 # Check if archive.edge.network is reachable
