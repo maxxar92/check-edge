@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.51"
+CEVERSION="0.52"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -38,11 +38,13 @@ else
    PREID="$(echo $((0x$(cat /etc/machine-id|cut -c1-10)))|cut -c-9)"
    DEVID="${PREID}$(echo $((${PREID} % 9)))"
    # Create Config File
+   EDGECLI="$(command -v edge-cli)"
    echo '# Set the URL to the server which runs the Telegram bot' >"$USRCFG"
    echo 'SERVERURL="http://server.domain.org/api/update"' >>"$USRCFG"
    echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
    echo "# by entering this text: /register $DEVICEID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
+   echo "EDGECLI=\"$EDGECLI\"" >>"$USRCFG"
    echo
    echo "You have to set the appropriate server URL. Ask the Edge Telegram community."
    echo "Run this command: nano $USRCFG"
@@ -73,7 +75,6 @@ if [ "$GITVER" != "" ] && [ "$CEVERSION" != "$GITVER" ]; then
 fi
 
 # Check if edge-cli is installed
-EDGECLI=$(command -v edge-cli)
 if [ "$EDGECLI" = "" ]; then
     echo
     echo "Program edge-cli not found."
@@ -100,11 +101,38 @@ case "${1,,}" in
 
   # Create Crontab entry for scheduled execution (default every 10 min.)
   "setcron")
-    JOB="*/10 * * * * ${0} >/dev/null 2>&1"
+    JOB="*/30 * * * * ${0} >/dev/null 2>&1"
     TMPC="/tmp/check-edge-cron"
     grep "${0}" -q <(crontab -l) || (crontab -l>"$TMPC"; echo "$JOB">>"$TMPC"; crontab "$TMPC")
     echo
     echo 'Crontab Entry is created. Please check it via "crontab -l" or change it via "crontab -e"'
+    echo
+    exit 0
+    ;;
+
+  # Show Config File
+  "config")
+    echo
+    cat $USRCFG
+    echo
+    exit 0
+    ;;
+
+  # Help
+  "help")
+    echo
+    echo "check-edge: Runs edge-cli check and posts changes to Telegram Bot."
+    echo
+    echo "Usage:"
+    echo "  check-edge [command]"
+    echo
+    echo "Available Commands:"
+    echo "  config     Show config file $USRCFG"
+    echo "  post       Post status to Telegram Bot, even if nothing has changed"
+    echo "  setcron    Create a Crontab entry for scheduled execution (default every 30 min.)"
+    echo "             Use crontab -e to change this setting"
+    echo "  update     Download the latest version from https://github.com/befranz/check-edge"
+    echo "  help       This output"
     echo
     exit 0
     ;;
