@@ -15,14 +15,14 @@ If you want to install your own Bot server, check this repository: [EdgeTelegram
 ### Requirements
 This script was tested on Debian, Ubuntu and Raspbian. You may try to install it on other platforms, feedback is appreciated.
 
-To install and run this script, *cURL* has to be installed on your machine. If you are not sure about this, just run these commands which install cURL if it's not already done:
+To install and run this script, **cURL** has to be installed on your machine. If you are not sure about this, just run these commands which install cURL if it's not already done:
 
 ```
 sudo apt update
 sudo apt install curl
 ```
 
-The check procedure itself (edge-cli check) needs to run as *root** there it's necessary for check-edge too.
+The check procedure itself (edge-cli check) needs to run as **root** there it's necessary for check-edge too.
 
 ### Installation
 Start the installation with this one-line command:
@@ -49,19 +49,19 @@ a configuration file is created which you have to edit by
 nano /root/scripts/check-edge.cfg
 ```
 
-Change *SERVERURL* to the URL you got from the Edge community.
-Copy your *DEVICEID*, you will need it to register your node on the Telegram Bot.
+Change **SERVERURL** to the URL you got from the Edge community.
+Copy your **DEVICEID**, you will need it to register your node on the Telegram Bot.
 Save the file by `CTRL-X Y <Enter>`.
 
 ### Register your Node on the Telegram Bot
-Connect to the *Edge Community Bot* (@edge_community_bot) and register your Device-ID:
+Connect to the **Edge Community Bot** (@edge_community_bot) and register your Device-ID:
 
 ```
 /register xxxxxxxxxx
 ```
 
 ### Usage
-Now you're ready to get your first message from your node on Telegram. To post a message even if there's no issue, run the script with the additional command *post*:
+Now you're ready to get your first message from your node on Telegram. To post a message even if there's no issue, run the script with the additional command **post**:
 
 ```
 check-edge post
