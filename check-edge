@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.5"
+CEVERSION="0.51"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -72,6 +72,15 @@ if [ "$GITVER" != "" ] && [ "$CEVERSION" != "$GITVER" ]; then
   echo
 fi
 
+# Check if edge-cli is installed
+EDGECLI=$(command -v edge-cli)
+if [ "$EDGECLI" = "" ]; then
+    echo
+    echo "Program edge-cli not found."
+    echo
+    exit 1
+fi
+
 # Check 1st parameter
 case "${1,,}" in
 
@@ -88,16 +97,18 @@ case "${1,,}" in
   "post")
     POST=1
     ;;
-esac
 
-# Check if edge-cli is installed
-EDGECLI=$(command -v edge-cli)
-if [ "$EDGECLI" = "" ]; then
+  # Create Crontab entry for scheduled execution (default every 10 min.)
+  "setcron")
+    JOB="*/10 * * * * ${0} >/dev/null 2>&1"
+    TMPC="/tmp/check-edge-cron"
+    grep "${0}" -q <(crontab -l) || (crontab -l>"$TMPC"; echo "$JOB">>"$TMPC"; crontab "$TMPC")
     echo
-    echo "Program edge-cli not found."
+    echo 'Crontab Entry is created. Please check it via "crontab -l" or change it via "crontab -e"'
     echo
-    exit 1
-fi
+    exit 0
+    ;;
+esac
 
 # Check if archive.edge.network is reachable
 RC=$(curl -sL -w "%{http_code}\n" "https://archive.edge.network/" -o /dev/null)
