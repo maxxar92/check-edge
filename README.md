@@ -6,7 +6,7 @@
 This script executes a procedure to check the local Edge node installation as part of the [Edge Network](https://edge.network/en/). If it finds any failed status it will send a message to a Telegram Bot server. The script avoids sending recurring messages with the same status.
 
 ## Telegram Bot Server
-There's already a working Telegram Bot server you can use. Ask the Edge Community on [Telegram](https://t.me/edgenetwork) or [Discord](https://discord.gg/GmaxgsK) for the specific URL of this server.
+There's already a working Telegram Bot server you can use and which is set as default.
 
 If you want to install your own Bot server, check this repository: [EdgeTelegramBot](https://github.com/maxxar92/EdgeTelegramBot)
 
@@ -43,7 +43,7 @@ When you start the script the first time by:
 check-edge
 ```
 
-a configuration file is created which you have to edit by
+a configuration file is created which is ready if you want to use the Edge Community Bot server. If you use a different server change it this way:
 
 ```
 nano /root/scripts/check-edge.cfg

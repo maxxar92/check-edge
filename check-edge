@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.53"
+CEVERSION="0.54"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -39,15 +39,17 @@ else
    DEVID="${PREID}$(echo $((${PREID} % 9)))"
    # Create Config File
    EDGECLI="$(command -v edge-cli)"
-   echo '# Set the URL to the server which runs the Telegram bot' >"$USRCFG"
-   echo 'SERVERURL="http://server.domain.org/api/update"' >>"$USRCFG"
+   echo '# URL to the server which runs the Telegram bot' >"$USRCFG"
+   echo 'SERVERURL="http://edge-analytics.org/api/update/"' >>"$USRCFG"
    echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
    echo "# by entering this text: /register $DEVID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
    echo "EDGECLI=\"$EDGECLI\"" >>"$USRCFG"
    echo
-   echo "You have to set the appropriate server URL. Ask the Edge Telegram community."
-   echo "Run this command: nano $USRCFG"
+   echo "URL to the Edge Community Bot is set."
+   echo "To change this URL: nano $USRCFG"
+   echo
+   echo "Register your Device-ID on the Telegram Bot by: /register $DEVID"
    echo
    exit 1
 fi
