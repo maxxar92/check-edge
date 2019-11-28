@@ -68,7 +68,7 @@ check-edge post
 ```
 
 ### Run Script via Cron
-With the following command you create a Crontab entry which will start the start every 30 minutes:
+With the following command you create a Crontab entry which will start the script every 30 minutes:
 
 ```
 check-edge setcron
