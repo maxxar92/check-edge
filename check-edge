@@ -1,0 +1,134 @@
+#!/bin/bash
+
+# CHECK-EDGE - Performs 'edge-cli check' and reports changes to Telegram Bot Server
+# Settings defined in ./check-edge.cfg
+# Github Repository: https://github.com/befranz/check-edge
+
+CEVERSION="0.5"
+
+# Send Telegram message via Serer Bot
+function sendmessage {
+  OK="$(echo -e '\u2713')"
+  NOK="$(echo -e '\u2717')"
+  TEXT="*${HOSTNAME^^}: ${1}*"$'\n'"${2}"
+  TEXT="${TEXT//$'\n'/\\n}"
+  TEXT="${TEXT//passed/${OK} }"
+  TEXT="${TEXT//failed/*${NOK}* }"
+  CURLRC=$(curl -w "%{http_code}" -s -o /dev/null -d '{"update_message":"'"$TEXT"'"}' -H "Content-Type: application/json" -X POST "$URL")
+  if [ "$CURLRC" = "200" ]; then
+    echo
+    echo "Message to Telegram Bot successfully sent."
+    echo
+    return 0
+  else
+    echo
+    echo "Message not sent! Return code: $CURLRC"
+    echo 'Make sure you did /register' $DEVICEID
+    echo
+    return 1
+  fi
+}
+
+# Read Individual Settings for Telegram
+USRCFG="$0.cfg"
+if [ -f "$USRCFG" ]; then
+   source "$USRCFG"
+else
+   # Create Device-ID
+   PREID="$(echo $((0x$(cat /etc/machine-id|cut -c1-10)))|cut -c-9)"
+   DEVID="${PREID}$(echo $((${PREID} % 9)))"
+   # Create Config File
+   echo '# Set the URL to the server which runs the Telegram bot' >"$USRCFG"
+   echo 'SERVERURL="http://server.domain.org/api/update"' >>"$USRCFG"
+   echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
+   echo "# by entering this text: /register $DEVICEID" >>"$USRCFG"
+   echo "DEVICEID=$DEVID" >>"$USRCFG"
+   echo
+   echo "You have to set the appropriate server URL. Ask the Edge Telegram community."
+   echo "Run this command: nano $USRCFG"
+   echo
+   exit 1
+fi
+
+if [ "${SERVERURL:-1}" != "/" ]; then
+  SERVERURL="${SERVERURL}/"
+fi
+URL="${SERVERURL}${DEVICEID}"
+
+# Running via Cron?
+if [ -t 1 ] ; then
+    VIACRON="0"
+else
+    VIACRON="1"
+    # Add random delay max. 60 sec.
+    sleep $(( (RANDOM % 60) + 1 ))s
+fi
+
+# Compare local version of check-edge with version on Github
+GITVER=$(curl -s 'https://raw.githubusercontent.com/befranz/check-edge/master/check-edge'|grep "^CEVERSION="|cut -d'"' -f2)
+if [ "$GITVER" != "" ] && [ "$CEVERSION" != "$GITVER" ]; then
+  echo
+  echo "You're running version $CEVERSION, there is version $GITVER on Github. Run: $(basename $0) update"
+  echo
+fi
+
+# Check 1st parameter
+case "${1,,}" in
+
+  # Update/download version from Github?
+  "update")
+    curl -s 'https://raw.githubusercontent.com/befranz/check-edge/master/check-edge' -o ~/scripts/check-edge
+    echo
+    echo "check-edge v.$GITVER was downloaded from Github."
+    echo
+    exit 0
+    ;;
+
+  # Post the output of the check to Telegram, even if nothing has changed
+  "post")
+    POST=1
+    ;;
+esac
+
+# Check if edge-cli is installed
+EDGECLI=$(command -v edge-cli)
+if [ "$EDGECLI" = "" ]; then
+    echo
+    echo "Program edge-cli not found."
+    echo
+    exit 1
+fi
+
+# Check if archive.edge.network is reachable
+RC=$(curl -sL -w "%{http_code}\n" "https://archive.edge.network/" -o /dev/null)
+if [ "$RC" -ne "200" ]; then
+    echo
+    echo "Edge Repo server archive.edge.network not reachable."
+    echo
+    exit 1
+fi
+
+# Perform the check
+RESULT="$($EDGECLI check)"
+ERROR="failed"
+LASTRESULTFAILED="/tmp/check-edge.failed"
+
+if [ "$POST" = "1" ]; then
+  sendmessage "" "$RESULT"
+  RC=$?
+else
+  if [[ "$RESULT" == *"$ERROR"* ]]; then
+    if [[ ! -f $LASTRESULTFAILED ]]; then
+      sendmessage "$NOK" "$RESULT"
+      RC=$?
+      echo -n > $LASTRESULTFAILED
+    fi
+  else
+    if [[ -f $LASTRESULTFAILED ]]; then
+      sendmessage "$OK" "$RESULT"
+      RC=$?
+      rm -f $LASTRESULTFAILED
+    fi
+  fi
+fi
+exit $RC
