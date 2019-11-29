@@ -4,13 +4,19 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.56"
+CEVERSION="0.57"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
   OK="$(echo -e '\u2713')"
   NOK="$(echo -e '\u2717')"
-  TEXT="*${HOSTNAME^^}: ${1}*"$'\n'"${2}"
+  if [ "$SENDUUID" = "Y" ]; then
+    UUID=$($EDGECLI info|cut -d' ' -f3)
+    UUID="$UUID"$'\n'
+  else
+    UUID=""
+  fi
+  TEXT="*${HOSTNAME^^}: ${1}*"$'\n'"${UUID}${2}"
   TEXT="${TEXT//$'\n'/\\n}"
   TEXT="${TEXT//passed/${OK} }"
   TEXT="${TEXT//failed/*${NOK}* }"
@@ -41,6 +47,9 @@ else
    EDGECLI="$(command -v edge-cli)"
    echo '# URL to the server which runs the Telegram bot' >"$USRCFG"
    echo 'SERVERURL="http://edge-analytics.org/api/update/"' >>"$USRCFG"
+   echo '# If you want to get the UUID of the node in the Telegram message' >>"$USRCFG"
+   echo '# change the value to Y' >>"$USRCFG"
+   echo 'SENDUUID="N"' >>"$USRCFG"
    echo '# Your Device-ID, DO NOT change it, use it to register it on the Telegram Bot' >>"$USRCFG"
    echo "# by entering this text: /register $DEVID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
