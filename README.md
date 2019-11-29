@@ -1,5 +1,5 @@
 # check-edge
- Checks the status of edge-cli and posts it to a Telegram bot
+ Checks the status of Edge host node and posts it to a Telegram bot
 
 <img src="https://github.com/befranz/check-edge/blob/master/img/edge-bot.jpg">
 
