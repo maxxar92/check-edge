@@ -1,7 +1,7 @@
 # check-edge
  Checks the status of edge-cli and posts it to a Telegram bot
 
-<img src="https://github.com/befranz/check-edge/blob/master/img/edgebot_img.jpeg" width="200">
+<img src="https://github.com/befranz/check-edge/blob/master/img/edge-bot.jpg">
 
 This script executes a procedure to check the local Edge node installation as part of the [Edge Network](https://edge.network/en/). If it finds any failed status it will send a message to a Telegram Bot server. The script avoids sending recurring messages with the same status.
 
