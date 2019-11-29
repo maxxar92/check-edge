@@ -43,15 +43,9 @@ When you start the script the first time by:
 check-edge
 ```
 
-a configuration file is created which is ready if you want to use the Edge Community Bot server. If you use a different server change it this way:
+a configuration file (`/root/scripts/check-edge.cfg`) is created which is ready if you want to use the Edge Community Bot server.
 
-```
-nano /root/scripts/check-edge.cfg
-```
-
-Change **SERVERURL** to the URL you got from the Edge community.
 Copy your **DEVICE-ID**, you will need it to register your node on the Telegram Bot.
-Save the file by `CTRL-X Y <Enter>`.
 
 ### Register your Node on the Telegram Bot
 Connect to the **Edge Community Bot** (@edge_community_bot) and register your Device-ID:
@@ -81,4 +75,3 @@ Further commands are shown by `check-edge help`.
 
 ## Contact
 Error reports and suggestions please via Github/Issues or PM on Telegram (@befranz)
-
