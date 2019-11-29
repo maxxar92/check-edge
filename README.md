@@ -22,7 +22,7 @@ sudo apt update
 sudo apt install curl
 ```
 
-The check procedure itself (edge-cli check) needs to run as **root** therefore it's necessary for check-edge too.
+The check procedure itself (`edge-cli check`) needs to run as **root** therefore it's necessary for check-edge too.
 
 ### Installation
 Start the installation with this one-line command:
@@ -32,9 +32,9 @@ curl -s https://raw.githubusercontent.com/befranz/check-edge/master/install-chec
 ```
 
 This install script
-- creates a folder in the root home folder (/root/scripts)
+- creates a folder in the root home folder (`/root/scripts`)
 - downloads the script into this folder
-- adds the path of this folder to the existing path in .profile
+- adds the path of this folder to the existing path in `/root/.profile`
 
 ### First Start of the Script
 When you start the script the first time by:
