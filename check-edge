@@ -4,7 +4,7 @@
 # Settings defined in ./check-edge.cfg
 # Github Repository: https://github.com/befranz/check-edge
 
-CEVERSION="0.57"
+CEVERSION="0.58"
 
 # Send Telegram message via Serer Bot
 function sendmessage {
@@ -19,7 +19,7 @@ function sendmessage {
   TEXT="*${HOSTNAME^^}: ${1}*"$'\n'"${UUID}${2}"
   TEXT="${TEXT//$'\n'/\\n}"
   TEXT="${TEXT//passed/${OK} }"
-  TEXT="${TEXT//failed/*${NOK}* }"
+  TEXT="${TEXT//failed/${NOK} }"
   CURLRC=$(curl -w "%{http_code}" -s -o /dev/null -d '{"update_message":"'"$TEXT"'"}' -H "Content-Type: application/json" -X POST "$URL")
   if [ "$CURLRC" = "200" ]; then
     echo
@@ -162,11 +162,11 @@ if [ "$RC" -ne "200" ]; then
     echo
     echo "Edge Repo server archive.edge.network not reachable."
     echo
-    exit 1
 fi
 
 # Perform the check
 RESULT="$($EDGECLI check)"
+echo "$RESULT" > "${0}.log"
 ERROR="failed"
 LASTRESULTFAILED="/tmp/check-edge.failed"
 
