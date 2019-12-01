@@ -54,6 +54,13 @@ else
    echo "# by entering this text: /register $DEVID" >>"$USRCFG"
    echo "DEVICEID=$DEVID" >>"$USRCFG"
    echo "EDGECLI=\"$EDGECLI\"" >>"$USRCFG"
+   echo '# Standard is to only send edge-check report if device is shown as offline in the explorer' >>"$USRCFG"
+   echo '# change value to N to notify of edge-cli check failures, regardless of node status.' >>"$USRCFG"
+   echo 'REQUIREOFFLINE="Y"' >>"$USRCFG"
+   echo '# URL to the host status update endpoint' >"$USRCFG"
+   echo 'STATUSURL="http://edge-analytics.org/api/host/"' >>"$USRCFG"
+   echo 'Minimum time in minutes a node must be offline before notifying the user'
+   echo 'OFFLINEMINTIME=45' >>"$USRCFG"
    echo
    echo "URL to the Edge Community Bot is set."
    echo "To change this URL: nano $USRCFG"
@@ -164,6 +171,34 @@ if [ "$RC" -ne "200" ]; then
     echo
 fi
 
+# get status of host
+if [ "$REQUIREOFFLINE" = "Y" ]; then
+  UUID=$($EDGECLI info|cut -d' ' -f3)
+  RC=$(curl -sL -w "%{http_code}\n" "${STATUSURL}${UUID}" -o /dev/null)
+  REPORTSTATUS=1
+  if [ "$RC" -ne "200" ]; then
+      echo
+      echo "Host status endpoint returning code $RC"
+      echo
+      REPORTSTATUS=0
+  else
+    HOSTSTATUS=$(curl -s "${STATUSURL}${UUID}")
+    if [ $HOSTSTATUS == "offline" ]; then
+      REPORTSTATUS=1
+    elif [ $HOSTSTATUS == "online" ]; then
+      REPORTSTATUS=0
+    else
+      OFFLINETIME=${HOSTSTATUS#"minutes_offline="}
+      if [ $OFFLINETIME -gt $OFFLINEMINTIME ]; then
+        REPORTSTATUS=1
+      else
+        REPORTSTATUS=0
+      fi
+    fi
+  fi
+fi
+
+
 # Perform the check
 RESULT="$($EDGECLI check)"
 echo "$RESULT" > "${0}.log"
@@ -173,18 +208,32 @@ LASTRESULTFAILED="/tmp/check-edge.failed"
 if [ "$POST" = "1" ]; then
   sendmessage "" "$RESULT"
   RC=$?
-else
-  if [[ "$RESULT" == *"$ERROR"* ]]; then
-    if [[ ! -f $LASTRESULTFAILED ]]; then
-      sendmessage "$NOK" "$RESULT"
-      RC=$?
-      echo -n > $LASTRESULTFAILED
+else  
+  if [[ "$REQUIREOFFLINE" == "Y" ]]; then
+    if [[ "$REPORTSTATUS" == 1 && ! -f $LASTRESULTFAILED ]]; then
+        RESULT="Node *offline* since ${OFFLINEMINTIME} minutes. Edge-cli check is:${RESULT}"
+        sendmessage "$NOK" "$RESULT"
+        RC=$?
+        echo -n > $LASTRESULTFAILED
+    elif [[ "$REPORTSTATUS" == 0 && -f $LASTRESULTFAILED ]]; then
+        RESULT="Node is back *online*. Edge-cli check is:${RESULT}"
+        sendmessage "$OK" "$RESULT"
+        RC=$?
+        rm -f $LASTRESULTFAILED
     fi
   else
-    if [[ -f $LASTRESULTFAILED ]]; then
-      sendmessage "$OK" "$RESULT"
-      RC=$?
-      rm -f $LASTRESULTFAILED
+    if [[ "$RESULT" == *"$ERROR"* ]]; then
+      if [[ ! -f $LASTRESULTFAILED ]]; then
+        sendmessage "$NOK" "$RESULT"
+        RC=$?
+        echo -n > $LASTRESULTFAILED
+      fi
+    else
+      if [[ -f $LASTRESULTFAILED ]]; then
+        sendmessage "$OK" "$RESULT"
+        RC=$?
+        rm -f $LASTRESULTFAILED
+      fi
     fi
   fi
 fi
