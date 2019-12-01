@@ -211,12 +211,12 @@ if [ "$POST" = "1" ]; then
 else  
   if [[ "$REQUIREOFFLINE" == "Y" ]]; then
     if [[ "$REPORTSTATUS" == 1 && ! -f $LASTRESULTFAILED ]]; then
-        RESULT="Node *offline* since ${OFFLINEMINTIME} minutes. Edge-cli check is:${RESULT}"
+        RESULT="Node *offline* since ${OFFLINEMINTIME} minutes. Edge-cli check is:\n${RESULT}"
         sendmessage "$NOK" "$RESULT"
         RC=$?
         echo -n > $LASTRESULTFAILED
     elif [[ "$REPORTSTATUS" == 0 && -f $LASTRESULTFAILED ]]; then
-        RESULT="Node is back *online*. Edge-cli check is:${RESULT}"
+        RESULT="Node is back *online*. Edge-cli check is:\n${RESULT}"
         sendmessage "$OK" "$RESULT"
         RC=$?
         rm -f $LASTRESULTFAILED
